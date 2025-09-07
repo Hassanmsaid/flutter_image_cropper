@@ -1,15 +1,17 @@
 package vn.hunghd.flutter.plugins.imagecropper;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import androidx.preference.PreferenceManager;
-
 import android.os.Build;
 import android.view.WindowInsetsController;
+
+import androidx.preference.PreferenceManager;
 
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.model.AspectRatio;
@@ -23,8 +25,6 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
-
-import static android.app.Activity.RESULT_OK;
 
 public class ImageCropperDelegate implements PluginRegistry.ActivityResultListener {
     static final String FILENAME_CACHE_KEY = "imagecropper.FILENAME_CACHE_KEY";
@@ -186,20 +186,23 @@ public class ImageCropperDelegate implements PluginRegistry.ActivityResultListen
             options.setToolbarColor(toolbarColor);
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-              // For Android 12 (API 31) and beyond
-          WindowInsetsController insetsController = activity.getWindow().getInsetsController();
-          if (insetsController != null) {
-             insetsController.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
-             activity.getWindow().setStatusBarColor(statusBarColor != null ? statusBarColor : Color.TRANSPARENT);
-          }
-        }
-        else{
-        if (statusBarColor != null) {
-            options.setStatusBarColor(statusBarColor);
-        } else if (toolbarColor != null) {
-            options.setStatusBarColor(darkenColor(toolbarColor));
-        }
+            // For Android 12 (API 31) and beyond
+            WindowInsetsController insetsController = activity.getWindow().getInsetsController();
+            if (insetsController != null) {
+                insetsController.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+                activity.getWindow().setStatusBarColor(statusBarColor != null ? statusBarColor : Color.TRANSPARENT);
+            }
+        } else {
+            if (statusBarColor != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    activity.getWindow().setStatusBarColor(statusBarColor);
+                }
+            } else if (toolbarColor != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    activity.getWindow().setStatusBarColor(statusBarColor);
+                }
+            }
         }
         if (toolbarWidgetColor != null) {
             options.setToolbarWidgetColor(toolbarWidgetColor);
